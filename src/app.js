@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //create obstacles
     function generateObstacle(){
-        let obstacleLeft = 600;
-        let randomHeight = Math.random() * 300 +100; //randomize height - 5
+        let obstacleLeft = 550;
+        let randomHeight = Math.random() * 1; //randomize height - 5
         let obstacleBottom = randomHeight; //adjust the height of the obstacles
         const obstacle = document.createElement('div'); //gonna create divs like this 
         const topObstacle = document.createElement('div');
