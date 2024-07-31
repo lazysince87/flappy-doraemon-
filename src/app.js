@@ -5,16 +5,19 @@ document.addEventListener('DOMContentLoaded', () => {
     var dora = document.querySelector('.doraemon');
     const gameDisplay = document.querySelector('.game-container');
     const sky = document.querySelector('.sky');
-   
+    const startButton = document.getElementById('startButton')
+    const resetButton = document.getElementById('resetButton')
 
 
     //some variables; adding space between skys left side and dora's left side to center dora in the sky
     let doraLeft = 300;
-    let doraBottom = 350;
+    let doraBottom = 290;
     let gravity = 2.5;
     let isGameOver = false;
-    let gap = 350;
+    let isPaused = true; //track if the game is paused or not
+    let gap = 360;
  
+    function Game(event) {
     //function to start the game where dora starts dropping out aka moving
     function startGame() {
 
@@ -22,10 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
             doraLeft <= 0 || doraLeft >= 1265) {
             gameOver();
         }
+        if (!isPaused) { //only drop dora if game is not paused
         doraBottom -= gravity; 
         dora.style.bottom = doraBottom + 'px';
         dora.style.left = doraLeft + 'px';//add 100 px to left of dora element
-
+        }
         checkCollision();
     }
 
@@ -49,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //create obstacles
     function generateObstacle(){
-        let obstacleLeft = 700;
-        let randomHeight = Math.random() * 5; //randomize height - 5
+        let obstacleLeft = 600;
+        let randomHeight = Math.random() * 300 +100; //randomize height - 5
         let obstacleBottom = randomHeight; //adjust the height of the obstacles
         const obstacle = document.createElement('div'); //gonna create divs like this 
         const topObstacle = document.createElement('div');
@@ -70,10 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         //make obstacles move 
         function moveObstacle() {
+            if (!isPaused) { //only move obstacles if game is not paused
             obstacleLeft -=2;
             obstacle.style.left = obstacleLeft + 'px';
             topObstacle.style.left = obstacleLeft + 'px';
-
+            }
             //make obstacles disappear if out of game display
             if(obstacleLeft === -88) { //230
                 cancelAnimationFrame(timerId);
@@ -84,10 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
             //not in the last 300 pixels that its traveled, and its in the middle of the grid, and 
             if 
             (
-            obstacleLeft < (doraLeft + 40) && //50
-            obstacleLeft > (doraLeft - 88) && //111
-            (doraBottom < (obstacleBottom + 240) || //240
-            doraBottom > (obstacleBottom + gap - 55)) //75
+                obstacleLeft < doraLeft + 40 &&
+                obstacleLeft + 88 > doraLeft &&
+                (
+                    doraBottom < obstacleBottom + 240 ||
+                    doraBottom + 53 > obstacleBottom + gap
+                )
             ) 
             { gameOver(); 
                 cancelAnimationFrame(timerId);
@@ -107,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('GAME OVER')
         isGameOver = true;
         document.removeEventListener('keyup', control);
+        resetButton.style.display = 'block'
         /*
         setTimeout(() => {
             location.reload(); // reload the page to start again
@@ -129,4 +137,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     
+    }//the whole game 
+
+    // Toggle pause state to start game only when space is pressed
+    function togglePauseGame(event) {
+        if (event.keyCode === 32) {
+            isPaused = !isPaused;
+            if (!isPaused) {
+                startButton.style.display = 'none'
+                Game(event) //start game
+            } else {
+                startButton.style.display = 'block'
+            }
+        }
+    }
+    startButton.addEventListener('click', () => {
+        isPaused = false;
+        startButton.style.display = 'none';
+        Game();
+    })
+
+    resetButton.addEventListener('click', () => {
+        location.reload();
+    })
+    //Event listener to toggle pause
+    document.addEventListener('keydown', togglePauseGame)
 })
